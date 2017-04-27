@@ -9,10 +9,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// DBDAL (database access layer) is the type returned when initializing an new
+// DBAL (database access layer) is the type returned when initializing an new
 // instance of this package. The functions listed are the functions that can
 // be used for this package.
-type DBDAL interface {
+type DBAL interface {
 	Exec(sqlFile string, params map[string]interface{}) (sql.Result, error)
 	Query(sqlFile string, params map[string]interface{}) (*sql.Rows, error)
 	QueryRow(sqlFile string, params map[string]interface{}) (*sql.Row, error)
@@ -27,21 +27,12 @@ type DB interface {
 	Ping() error
 }
 
-// FileStore is a package agnostic interface for any type of virtual file
-// system that returns the value as string.
-//
-// Of course the string MUST be the SQL template that will be used upon
-// executing a query function (Query, QueryRow, etc).
-type FileStore interface {
-	Get(file string) (string, error)
-}
-
 type dbal struct {
 	db DB
 }
 
-// New returns a DBDAL using the given DB and FileStore.
-func New(db DB) DBDAL {
+// New returns a DBAL using the given DB and FileStore.
+func New(db DB) DBAL {
 	return &dbal{
 		db: db,
 	}

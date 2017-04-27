@@ -3,7 +3,7 @@ package dbal
 import (
 	"database/sql"
 
-	"github.com/magicalbanana/dal/sqltmpl"
+	"github.com/magicalbanana/dbal/sqltmpl"
 )
 
 // QueryRow uses the given sqlFile and params to execute sql.QueryRow. Before

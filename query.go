@@ -3,7 +3,7 @@ package dbal
 import (
 	"database/sql"
 
-	"github.com/magicalbanana/dal/sqltmpl"
+	"github.com/magicalbanana/dbal/sqltmpl"
 )
 
 // Query uses the given sqlFile and params to execute sql.Query. Before it
