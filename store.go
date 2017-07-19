@@ -16,6 +16,7 @@ type DBAL interface {
 	Exec(sqlFile string, params map[string]interface{}) (sql.Result, error)
 	Query(sqlFile string, params map[string]interface{}) (*sql.Rows, error)
 	QueryRow(sqlFile string, params map[string]interface{}) (*sql.Row, error)
+	Close() error
 }
 
 // DB is an interface modeled after the go's standard database/sql package.
@@ -25,6 +26,7 @@ type DB interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 	QueryRow(query string, args ...interface{}) *sql.Row
 	Ping() error
+	Close() error
 }
 
 type dbal struct {
