@@ -31,7 +31,7 @@ func TestRowsToMap(t *testing.T) {
 				assert.NoError(t, qryErr)
 
 				// act
-				m := RowsToMap(rows)
+				m, _ := RowsToMap(rows)
 
 				// assertion
 				assert.Equal(t, m[0]["first_name"], "piggly", desc)
