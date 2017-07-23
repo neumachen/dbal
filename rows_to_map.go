@@ -1,6 +1,8 @@
 package dbal
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 // RowsToMap takes the current sql.Rows and maps each column and value to a
 // map[string]interface{}.
@@ -29,9 +31,9 @@ func RowsToMap(rows *sql.Rows) (map[int]map[string]interface{}, error) {
 		for i, col := range columns {
 			var v interface{}
 			val := values[i]
-			b, ok := val.([]byte)
+			b, ok := val.([]uint8)
 			if ok {
-				v = string(b)
+				v = []byte(b)
 			} else {
 				v = val
 			}
