@@ -4,7 +4,7 @@ import "database/sql"
 
 // RowsToMap takes the current sql.Rows and maps each column and value to a
 // map[string]interface{}.
-func RowsToMap(rows *sql.Rows) map[int]map[string]interface{} {
+func RowsToMap(rows *sql.Rows) (map[int]map[string]interface{}, error) {
 	columns, _ := rows.Columns()
 	count := len(columns)
 	values := make([]interface{}, count)
@@ -16,7 +16,10 @@ func RowsToMap(rows *sql.Rows) map[int]map[string]interface{} {
 		for i := range columns {
 			valuePtrs[i] = &values[i]
 		}
-		rows.Scan(valuePtrs...)
+		scanErr := rows.Scan(valuePtrs...)
+		if scanErr != nil {
+			return nil, scanErr
+		}
 
 		tmpStruct := map[string]interface{}{}
 
@@ -36,5 +39,5 @@ func RowsToMap(rows *sql.Rows) map[int]map[string]interface{} {
 		resultID++
 	}
 
-	return finalResult
+	return finalResult, nil
 }
