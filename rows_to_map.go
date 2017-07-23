@@ -5,7 +5,10 @@ import "database/sql"
 // RowsToMap takes the current sql.Rows and maps each column and value to a
 // map[string]interface{}.
 func RowsToMap(rows *sql.Rows) (map[int]map[string]interface{}, error) {
-	columns, _ := rows.Columns()
+	columns, cErr := rows.Columns()
+	if cErr != nil {
+		return nil, cErr
+	}
 	count := len(columns)
 	values := make([]interface{}, count)
 	valuePtrs := make([]interface{}, count)
