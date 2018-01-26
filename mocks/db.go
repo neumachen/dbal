@@ -54,6 +54,11 @@ func (db *Db) Ping() error {
 	return errors.New("mock Ping error")
 }
 
+// Close ...
+func (db *Db) Close() error {
+	return nil
+}
+
 // Result is a mock of sql.Result
 type Result struct {
 	LastInsertIDOk bool
