@@ -72,8 +72,7 @@ func (p *parser) setQuery(queryText string) {
 		character, width = utf8.DecodeRuneInString(queryText[i:])
 		i += width
 
-		// if it's a colon, do not write to builder, but grab name
-		if character == ':' {
+		if character == '$' {
 
 			for {
 

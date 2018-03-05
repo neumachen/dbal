@@ -42,63 +42,75 @@ func TestQueryParsing(test *testing.T) {
 			Name:     "NoParameter",
 		},
 		QueryParsingTest{
-			Input:              "SELECT * FROM table WHERE col1 = :name",
+			Input:              "SELECT * FROM table WHERE col1 = $name",
 			Expected:           "SELECT * FROM table WHERE col1 = $1",
 			ExpectedParameters: 1,
 			Name:               "SingleParameter",
 		},
 		QueryParsingTest{
-			Input:              "SELECT * FROM table WHERE col1 = :name AND col2 = :occupation",
+			Input:              "SELECT * FROM table WHERE col1 = $name::text",
+			Expected:           "SELECT * FROM table WHERE col1 = $1::text",
+			ExpectedParameters: 1,
+			Name:               "With type assertion",
+		},
+		QueryParsingTest{
+			Input:              "SELECT * FROM table WHERE col1 = $name AND col2 = $occupation",
 			Expected:           "SELECT * FROM table WHERE col1 = $1 AND col2 = $2",
 			ExpectedParameters: 2,
 			Name:               "TwoParameters",
 		},
 		QueryParsingTest{
-			Input:              "SELECT * FROM table WHERE col1 = :name AND col2 = :occupation",
+			Input:              "SELECT * FROM table WHERE col1 = $name AND col2 = $name",
 			Expected:           "SELECT * FROM table WHERE col1 = $1 AND col2 = $2",
 			ExpectedParameters: 2,
 			Name:               "OneParameterMultipleTimes",
 		},
 		QueryParsingTest{
-			Input:              "SELECT * FROM table WHERE col1 IN (:something, :else)",
+			Input:              "SELECT * FROM table WHERE col1 IN ($something, $else)",
 			Expected:           "SELECT * FROM table WHERE col1 IN ($1, $2)",
 			ExpectedParameters: 2,
 			Name:               "ParametersInParenthesis",
 		},
 		QueryParsingTest{
-			Input:    "SELECT * FROM table WHERE col1 = ':literal' AND col2 LIKE ':literal'",
-			Expected: "SELECT * FROM table WHERE col1 = ':literal' AND col2 LIKE ':literal'",
+			Input:    "SELECT * FROM table WHERE col1 = '$literal' AND col2 LIKE '$literal'",
+			Expected: "SELECT * FROM table WHERE col1 = '$literal' AND col2 LIKE '$literal'",
 			Name:     "ParametersInQuotes",
 		},
 		QueryParsingTest{
-			Input:              "SELECT * FROM table WHERE col1 = ':literal' AND col2 = :literal AND col3 LIKE ':literal'",
-			Expected:           "SELECT * FROM table WHERE col1 = ':literal' AND col2 = $1 AND col3 LIKE ':literal'",
+			Input:              "SELECT * FROM table WHERE col1 = '$literal' AND col2 = $literal AND col3 LIKE '$literal'",
+			Expected:           "SELECT * FROM table WHERE col1 = '$literal' AND col2 = $1 AND col3 LIKE '$literal'",
 			ExpectedParameters: 1,
 			Name:               "ParametersInQuotes2",
 		},
 		QueryParsingTest{
-			Input:              "SELECT * FROM table WHERE col1 = :foo AND col2 IN (SELECT id FROM tabl2 WHERE col10 = :bar)",
+			Input:              "SELECT * FROM table WHERE col1 = $foo AND col2 IN (SELECT id FROM tabl2 WHERE col10 = $bar)",
 			Expected:           "SELECT * FROM table WHERE col1 = $1 AND col2 IN (SELECT id FROM tabl2 WHERE col10 = $2)",
 			ExpectedParameters: 2,
 			Name:               "ParametersInSubclause",
 		},
 		QueryParsingTest{
-			Input:              "SELECT * FROM table WHERE col1 = :1234567890 AND col2 = :0987654321",
+			Input:              "SELECT * FROM table WHERE col1 = $1234567890 AND col2 = $0987654321",
 			Expected:           "SELECT * FROM table WHERE col1 = $1 AND col2 = $2",
 			ExpectedParameters: 2,
 			Name:               "NumericParameters",
 		},
 		QueryParsingTest{
-			Input:              "SELECT * FROM table WHERE col1 = :ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			Input:              "SELECT * FROM table WHERE col1 = $ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 			Expected:           "SELECT * FROM table WHERE col1 = $1",
 			ExpectedParameters: 1,
 			Name:               "CapsParameters",
 		},
 		QueryParsingTest{
-			Input:              "SELECT * FROM table WHERE col1 = :abc123ABC098",
+			Input:              "SELECT * FROM table WHERE col1 = $abc123ABC098",
 			Expected:           "SELECT * FROM table WHERE col1 = $1",
 			ExpectedParameters: 1,
 			Name:               "AltcapsParameters",
+		},
+		QueryParsingTest{
+			Input:              "SELECT * FROM table WHERE col1 LIKE %$test%",
+			Expected:           "SELECT * FROM table WHERE col1 LIKE %$1%",
+			ExpectedParameters: 1,
+			Name:               "pattern matching",
 		},
 	}
 
@@ -110,6 +122,7 @@ func TestQueryParsing(test *testing.T) {
 		// test prsr texts
 		if prsr.GetParsedQuery() != parsingTest.Expected {
 			test.Log("Test '", parsingTest.Name, "': Expected prsr text did not match actual parsed output")
+			test.Log("Expected", parsingTest.Expected)
 			test.Log("Actual: ", prsr.GetParsedQuery())
 			test.Fail()
 		}
@@ -140,7 +153,7 @@ func TestParameterReplacement(test *testing.T) {
 		ParameterParsingTest{
 
 			Name:  "SingleStringParameter",
-			Query: "SELECT * FROM table WHERE col1 = :foo",
+			Query: "SELECT * FROM table WHERE col1 = $foo",
 			Parameters: []TestQueryParameter{
 				TestQueryParameter{
 					Name:  "foo",
@@ -154,7 +167,7 @@ func TestParameterReplacement(test *testing.T) {
 		ParameterParsingTest{
 
 			Name:  "TwoStringParameter",
-			Query: "SELECT * FROM table WHERE col1 = :foo AND col2 = :foo2",
+			Query: "SELECT * FROM table WHERE col1 = $foo AND col2 = $foo2",
 			Parameters: []TestQueryParameter{
 				TestQueryParameter{
 					Name:  "foo",
@@ -172,7 +185,7 @@ func TestParameterReplacement(test *testing.T) {
 		ParameterParsingTest{
 
 			Name:  "TwiceOccurringParameter",
-			Query: "SELECT * FROM table WHERE col1 = :foo AND col2 = :foo",
+			Query: "SELECT * FROM table WHERE col1 = $foo AND col2 = $foo",
 			Parameters: []TestQueryParameter{
 				TestQueryParameter{
 					Name:  "foo",
@@ -186,7 +199,7 @@ func TestParameterReplacement(test *testing.T) {
 		ParameterParsingTest{
 
 			Name:  "ParameterTyping",
-			Query: "SELECT * FROM table WHERE col1 = :str AND col2 = :int AND col3 = :pi",
+			Query: "SELECT * FROM table WHERE col1 = $str AND col2 = $int AND col3 = $pi",
 			Parameters: []TestQueryParameter{
 				TestQueryParameter{
 					Name:  "str",
@@ -208,7 +221,7 @@ func TestParameterReplacement(test *testing.T) {
 		ParameterParsingTest{
 
 			Name:  "ParameterOrdering",
-			Query: "SELECT * FROM table WHERE col1 = :foo AND col2 = :bar AND col3 = :foo AND col4 = :foo AND col5 = :bar",
+			Query: "SELECT * FROM table WHERE col1 = $foo AND col2 = $bar AND col3 = $foo AND col4 = $foo AND col5 = $bar",
 			Parameters: []TestQueryParameter{
 				TestQueryParameter{
 					Name:  "foo",
@@ -226,7 +239,7 @@ func TestParameterReplacement(test *testing.T) {
 		ParameterParsingTest{
 
 			Name:  "ParameterCaseSensitivity",
-			Query: "SELECT * FROM table WHERE col1 = :foo AND col2 = :FOO",
+			Query: "SELECT * FROM table WHERE col1 = $foo AND col2 = $FOO",
 			Parameters: []TestQueryParameter{
 				TestQueryParameter{
 					Name:  "foo",
