@@ -13,9 +13,9 @@ import (
 // instance of this package. The functions listed are the functions that can
 // be used for this package.
 type DBAL interface {
-	Exec(sqlFile string, params map[string]interface{}) (sql.Result, error)
-	Query(sqlFile string, params map[string]interface{}) (*sql.Rows, error)
-	QueryRow(sqlFile string, params map[string]interface{}) (*sql.Row, error)
+	Exec(sqlFile string, params QueryParams) (sql.Result, error)
+	Query(sqlFile string, params QueryParams) (*sql.Rows, error)
+	QueryRow(sqlFile string, params QueryParams) (*sql.Row, error)
 	Close() error
 }
 
@@ -31,6 +31,11 @@ type DB interface {
 
 type dbal struct {
 	db DB
+}
+
+// Close ...
+func (d *dbal) Close() error {
+	return d.db.Close()
 }
 
 // New returns a DBAL using the given DB and FileStore.

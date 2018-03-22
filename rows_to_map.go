@@ -4,6 +4,9 @@ import (
 	"database/sql"
 )
 
+// MappedSQLRows ...
+type MappedSQLRows map[int]map[string]interface{}
+
 // RowsToMap takes the current sql.Rows and maps each column and value to a
 // map[string]interface{}.
 func RowsToMap(rows *sql.Rows) (map[int]map[string]interface{}, error) {

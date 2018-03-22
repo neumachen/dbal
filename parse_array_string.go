@@ -14,7 +14,7 @@ func ParsePGArrayString(array string) ([]string, error) {
 		switch {
 		case !arrayOpened:
 			if r != '{' {
-				return nil, errors.New("Doesn't appear to be a postgres array.  Doesn't start with an opening curly brace.")
+				return nil, errors.New("Doesn't appear to be a postgres array. Doesn't start with an opening curly brace.")
 			}
 			arrayOpened = true
 		case escapeOpened:
