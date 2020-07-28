@@ -1,8 +1,8 @@
 package sqltmpl
 
 import (
-	"bytes"
 	"strconv"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -55,9 +55,14 @@ func NewParser(queryText string) Parser {
 // setQuery parses out all named parameters, stores their locations, and
 // builds a "revised" query which uses positional parameters.
 func (p *parser) setQuery(queryText string) {
+	var revisedBuilder strings.Builder
+	// reset the builder
+	defer revisedBuilder.Reset()
 
-	var revisedBuilder bytes.Buffer
-	var parameterBuilder bytes.Buffer
+	var parameterBuilder strings.Builder
+	// reset this builder as well
+	defer parameterBuilder.Reset()
+
 	var position []int
 	var character rune
 	var parameterName string
@@ -68,14 +73,11 @@ func (p *parser) setQuery(queryText string) {
 	positionIndex = 0
 
 	for i := 0; i < len(queryText); {
-
 		character, width = utf8.DecodeRuneInString(queryText[i:])
 		i += width
 
 		if character == '$' {
-
 			for {
-
 				character, width = utf8.DecodeRuneInString(queryText[i:])
 				i += width
 
@@ -107,9 +109,7 @@ func (p *parser) setQuery(queryText string) {
 
 		// if it's a quote, continue writing to builder, but do not search for parameters.
 		if character == '\'' {
-
 			for {
-
 				character, width = utf8.DecodeRuneInString(queryText[i:])
 				i += width
 				revisedBuilder.WriteString(string(character))
@@ -141,7 +141,6 @@ func (p *parser) GetParsedParameters() []interface{} {
 // If the parsed query does not have a placeholder for the given [parameterName],
 // p method does nothing.
 func (p *parser) SetValue(parameterName string, parameterValue interface{}) {
-
 	for _, position := range p.positions[parameterName] {
 		p.parameters[position] = parameterValue
 	}
@@ -153,7 +152,6 @@ func (p *parser) SetValue(parameterName string, parameterValue interface{}) {
 // keys/values present in the map that aren't part of the query, they are
 // ignored.
 func (p *parser) SetValuesFromMap(parameters map[string]interface{}) {
-
 	for name, value := range parameters {
 		p.SetValue(name, value)
 	}

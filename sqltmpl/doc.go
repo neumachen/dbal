@@ -4,13 +4,13 @@
 // Named parameters are not supported by all SQL query engines, and their standards are scattered.
 // But positional parameters have wide adoption across all databases.
 //
-// npq package translates SQL queries which use named parameters into queries which use positional parameters.
+// package translates SQL queries which use named parameters into queries which use positional parameters.
 //
 // Example usage:
 //
 // 	query := NewNamedParameterQuery("
 // 		SELECT * FROM table
-// 		WHERE col1 = :foo
+// 		WHERE col1 = $foo
 // 	")
 //
 // 	query.SetValue("foo", "bar")
@@ -28,15 +28,15 @@
 //
 // 	query := NewNamedParameterQuery("
 // 		SELECT * FROM table
-// 		WHERE col1 = :foo
-// 		AND col2 IN(:firstName, :middleName, :lastName)
+// 		WHERE col1 = $foo
+// 		AND col2 IN($first_name, $middle_name, $last_name)
 // 	")
 //
 // 	var parameterMap = map[string]interface{} {
 // 		"foo": 		"bar",
-// 		"firstName": 	"Alice",
-// 		"lastName": 	"Bob"
-// 		"middleName": 	"Eve",
+// 		"first_name": 	"Alice",
+// 		"last_name": 	"Bob"
+// 		"middle_name": 	"Eve",
 // 	}
 //
 // 	query.SetValuesFromMap(parameterMap)
