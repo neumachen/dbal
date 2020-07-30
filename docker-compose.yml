@@ -1,0 +1,24 @@
+---
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:11
+    environment:
+      POSTGRES_DB: dbal_development
+      POSTGRES_USER: dbal
+      POSTGRES_PASSWORD: dbal
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  postgres-migration:
+    build:
+      context: .
+      dockerfile: tests/postgres-migration.Dockerfile
+    volumes:
+      - ./tests/migrations:/app/resources/postgres/migrations
+
+volumes:
+  postgres: {}

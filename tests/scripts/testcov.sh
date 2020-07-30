@@ -20,6 +20,7 @@ generate_cover_data() {
     rm -rf "$workdir"
     mkdir "$workdir"
 
+    # turn off test caching
     for pkg in "$@"; do
         f="$workdir/$(echo $pkg | tr / -).cover"
         go test -covermode="$mode" -coverprofile="$f" "$pkg"

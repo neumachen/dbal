@@ -1,12 +1,12 @@
-package mocks
+package dbal
 
 import (
 	"database/sql"
 	"errors"
 )
 
-// Db mocks out sqlx.DB for the purpose of testing.
-type Db struct {
+// mockDb mocks out sqlx.m for the purpose of testing.
+type mockDb struct {
 	PingOk     bool
 	ExecOk     bool
 	PrepareOk  bool
@@ -15,47 +15,47 @@ type Db struct {
 }
 
 // Prepare ...
-func (db *Db) Prepare(query string) (*sql.Stmt, error) {
-	if db.PrepareOk {
+func (m *mockDb) Prepare(query string) (*sql.Stmt, error) {
+	if m.PrepareOk {
 		return &sql.Stmt{}, nil
 	}
 	return nil, errors.New("mock error")
 }
 
 // Exec ...
-func (db *Db) Exec(query string, args ...interface{}) (sql.Result, error) {
-	if db.ExecOk {
+func (m *mockDb) Exec(query string, args ...interface{}) (sql.Result, error) {
+	if m.ExecOk {
 		return &Result{}, nil
 	}
 	return nil, errors.New("mock error")
 }
 
 // Query ...
-func (db *Db) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	if db.QueryOk {
+func (m *mockDb) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	if m.QueryOk {
 		return nil, nil
 	}
 	return nil, errors.New("mock error")
 }
 
 // QueryRow ...
-func (db *Db) QueryRow(query string, args ...interface{}) *sql.Row {
-	if db.QueryRowOk {
+func (m *mockDb) QueryRow(query string, args ...interface{}) *sql.Row {
+	if m.QueryRowOk {
 		return &sql.Row{}
 	}
 	return nil
 }
 
 // Ping ...
-func (db *Db) Ping() error {
-	if db.PingOk {
+func (m *mockDb) Ping() error {
+	if m.PingOk {
 		return nil
 	}
 	return errors.New("mock Ping error")
 }
 
 // Close ...
-func (db *Db) Close() error {
+func (m *mockDb) Close() error {
 	return nil
 }
 

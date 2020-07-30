@@ -1,9 +1,9 @@
 -- Migration goes here.
-create table customers(
-  customer_id serial primary key,
-  first_name  varchar not null,
-  last_name   varchar not null,
-  address     jsonb   not null,
-  created_at  timestamp without time zone default (now() at time zone 'utc') not null,
-  updated_at  timestamp without time zone default (now() at time zone 'utc') not null
+CREATE TABLE customers(
+  customer_id SERIAL primary key,
+  first_name  VARCHAR not null,
+  last_name   VARCHAR not null,
+  address     JSONB   not null,
+  created_at  TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC') NOT NULL,
+  updated_at  TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC') NOT NULL
 );

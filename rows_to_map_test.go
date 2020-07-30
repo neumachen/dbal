@@ -1,10 +1,9 @@
 package dbal
 
 import (
-	"database/sql"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/c2fo/testify/require"
 )
 
 func TestRowsToMap(t *testing.T) {
@@ -17,29 +16,29 @@ func TestRowsToMap(t *testing.T) {
 			desc: "maps row columns to a map[string]interface{}",
 			assertion: func(t *testing.T, desc string) {
 				// arrangement
-				db, openErr := sql.Open("postgres", "dbname=dbal_test sslmode=disable")
-				assert.NoError(t, openErr)
+				db := testLoadDBAL(t)
+				defer db.Close()
 				params := map[string]interface{}{
 					"first_name": "piggly",
 					"last_name":  "wiggly",
 					"address":    []byte(`{"test": "pigglywiggly"}`),
 				}
-				d := &dbal{db: db}
-				_, qryErr := d.Query(insertCustomer, params)
-				assert.NoError(t, qryErr, "insert customer")
-				rows, qryErr := d.Query(selectCustomer, params)
-				assert.NoError(t, qryErr)
+
+				_, qryErr := db.Query(insertCustomer, params)
+				require.NoError(t, qryErr, "insert customer")
+				rows, qryErr := db.Query(selectCustomer, params)
+				require.NoError(t, qryErr)
 
 				// act
 				m, _ := RowsToMap(rows)
 
 				// assertion
-				assert.Equal(t, m[0]["first_name"], "piggly", desc)
-				assert.Equal(t, m[0]["last_name"], "wiggly", desc)
+				require.Equal(t, m[0]["first_name"], "piggly", desc)
+				require.Equal(t, m[0]["last_name"], "wiggly", desc)
 
 				// clean up
-				_, qryErr = d.Query(deleteCustomer, params)
-				assert.NoError(t, qryErr, "delete customer")
+				_, qryErr = db.Query(deleteCustomer, params)
+				require.NoError(t, qryErr, "delete customer")
 			},
 		},
 	}
