@@ -1,11 +1,9 @@
 package dbal
 
 import (
-	"database/sql"
 	"testing"
 
-	"github.com/magicalbanana/dbal/mocks"
-	"github.com/stretchr/testify/assert"
+	"github.com/c2fo/testify/require"
 )
 
 func TestExec(t *testing.T) {
@@ -19,36 +17,35 @@ func TestExec(t *testing.T) {
 			desc: "db.Prepare returned an error",
 			assertion: func(t *testing.T, desc string) {
 				// arrangement
-				d := &dbal{db: &mocks.Db{PrepareOk: false}}
+				d := &dbal{db: &mockDb{PrepareOk: false}}
 
 				// act
 				_, err := d.Exec(badSQLStmnt, nil)
 
 				// assertion
-				assert.Error(t, err)
+				require.Error(t, err, desc)
 			},
 		},
 		{
 			desc: "db.Prepare did not return an error",
 			assertion: func(t *testing.T, desc string) {
-				db, openErr := sql.Open("postgres", "dbname=dbal_test sslmode=disable")
-				assert.NoError(t, openErr)
+				db := testLoadDBAL(t)
+				defer db.Close()
 				params := map[string]interface{}{
 					"first_name": "bearpig",
 					"last_name":  "man",
 					"address":    []byte(`{ "test": "foo" }`),
 				}
-				d := &dbal{db: db}
 
 				// act
-				_, qryErr := d.Exec(insertCustomer, params)
+				_, qryErr := db.Exec(insertCustomer, params)
 
 				// assertion
-				assert.NoError(t, qryErr)
+				require.NoError(t, qryErr, desc)
 
 				// clean up
-				_, qryErr = d.Query(deleteCustomer, params)
-				assert.NoError(t, qryErr)
+				_, qryErr = db.Query(deleteCustomer, params)
+				require.NoError(t, qryErr, desc)
 			},
 		},
 	}

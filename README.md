@@ -19,7 +19,9 @@
 
 ## Description
 
-This package wraps the `database/sql` package.
+This package wraps the `database/sql` package by allowing you to specify
+parameters in a map and converting the SQL parameters to positional parameters
+to leverage the SQL santizaton provided by the `database/sql` package.
 
 ## Development
 
@@ -30,3 +32,8 @@ This package is still under active development. It is wise to vendor this packag
 ## Usage
 
 TBD ...
+
+## TODO
+
+- [ ] add support for transactions
+- [ ] speed up SQL parsing

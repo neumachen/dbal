@@ -1,0 +1,34 @@
+{
+  "connection": {
+    "admin": {
+      "ping_intervals": 5,
+      "username": "dbal",
+      "password": "dbal",
+      "template_database": "postgres",
+      "host": "postgres",
+      "port": 5432,
+      "query_params": {
+        "sslmode": "disable"
+      }
+    },
+    "migration": {
+      "ping_intervals": 5,
+      "username": "dbal",
+      "password": "dbal",
+      "database": "dbal_development",
+      "host": "postgres",
+      "port": 5432,
+      "query_params": {
+        "sslmode": "disable"
+      }
+    }
+  },
+  "migration": {
+    "directory": "./tests/migrations/",
+    "table": {
+      "schema": "public",
+      "table": "schema_migrations"
+    }
+  }
+}
+
