@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/c2fo/testify/require"
+	"github.com/stretchr/testify/require"
 )
 
 var badSQLStmnt = `SSSSSS`

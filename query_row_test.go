@@ -3,7 +3,7 @@ package dbal
 import (
 	"testing"
 
-	"github.com/c2fo/testify/require"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQueryRow(t *testing.T) {

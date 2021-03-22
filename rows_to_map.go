@@ -4,12 +4,16 @@ import (
 	"database/sql"
 )
 
+// MappedSQLRow ...
+// Improve this to not use interface{}
+type MappedSQLRow map[string]interface{}
+
 // MappedSQLRows ...
-type MappedSQLRows map[int]map[string]interface{}
+type MappedSQLRows map[int]MappedSQLRow
 
 // RowsToMap takes the current sql.Rows and maps each column and value to a
 // map[string]interface{}.
-func RowsToMap(rows *sql.Rows) (map[int]map[string]interface{}, error) {
+func RowsToMap(rows *sql.Rows) (MappedSQLRows, error) {
 	columns, cErr := rows.Columns()
 	if cErr != nil {
 		return nil, cErr
@@ -18,7 +22,7 @@ func RowsToMap(rows *sql.Rows) (map[int]map[string]interface{}, error) {
 	values := make([]interface{}, count)
 	valuePtrs := make([]interface{}, count)
 
-	finalResult := map[int]map[string]interface{}{}
+	finalResult := MappedSQLRows{}
 	resultID := 0
 	for rows.Next() {
 		for i := range columns {

@@ -5,7 +5,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/c2fo/testify/require"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNew(t *testing.T) {

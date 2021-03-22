@@ -1,72 +1,73 @@
 ---
 kind: pipeline
+type: docker
 name: build-test
 
-services:
-  - name: postgres
-    image: postgres:11
-    environment:
-      POSTGRES_DB: dbal_development
-      POSTGRES_USER: dbal
-      POSTGRES_PASSWORD: dbal
-
-volumes:
-  - name: deps
-    temp: {}
+platform:
+  os: linux
+  arch: amd64
 
 steps:
-  - name: build-modules
-    image: golang:1.14.2-alpine3.11
-    volumes:
-      - name: deps
-        path: /go
-    commands:
-      - apk add --no-cache git
-      - go mod tidy
-      - go build -v ./...
-      - go mod vendor
+- name: build-modules
+  image: golang:1.16.2-stretch
+  commands:
+  - go mod tidy
+  - go build -v ./...
+  - go mod vendor
+  volumes:
+  - name: deps
+    path: /go
 
-  - name: wait-for-it
-    image: svajone/wait-for-it:latest
-    pull: always
-    commands:
-      - apk add --update --no-cache bash
-      - wait-for-it.sh -h 'postgres' -p 5432 -t 180
+- name: wait-for-it
+  pull: always
+  image: svajone/wait-for-it:latest
+  commands:
+  - apk add --update --no-cache bash
+  - "wait-for-it.sh -h 'postgres' -p 5432 -t 180"
 
-  - name: postgres-migrations
-    image: svajone/pgmngr:v0.1.0
-    depends_on:
-      - wait-for-it
-    pull: always
-    commands:
-      - pgmngr -c .pgmngr.json migration forward
+- name: postgres-migrations
+  pull: always
+  image: svajone/pgmngr:v0.1.0
+  commands:
+  - pgmngr -c .pgmngr.json migration forward
+  depends_on:
+  - wait-for-it
 
-  - name: test
-    # the reason we're using this image here is because of:
-    # https://github.com/golang/go/issues/14481
-    image: golang:1.14.6-stretch
-    environment:
-      DBAL_PG_DB: postgres://dbal:dbal@postgres:5432/dbal_development?sslmode=disable
-    volumes:
-      - name: deps
-        path: /go
-    depends_on:
-      - build-modules
-      - postgres-migrations
-    commands:
-      - tests/scripts/testcov.sh
+- name: test
+  image: golang:1.16.2-stretch
+  commands:
+  - tests/scripts/testcov.sh
+  environment:
+    DBAL_PG_DB: "postgres://dbal:dbal@postgres:5432/dbal_development?sslmode=disable"
+  volumes:
+  - name: deps
+    path: /go
+  depends_on:
+  - build-modules
+  - postgres-migrations
 
-  - name: codecov
-    image: plugins/codecov
-    depends_on:
-      - test
-    volumes:
-      - name: deps
-        path: /go
-    settings:
-      required: true
-      paths:
-        # see tests/scripts/testcov.sh $workdir
-        - .cover
-      token:
-        from_secret: codecov-token
+- name: codecov
+  image: plugins/codecov
+  settings:
+    paths:
+    - .cover
+    required: true
+    token:
+      from_secret: codecov-token
+  volumes:
+  - name: deps
+    path: /go
+  depends_on:
+  - test
+
+services:
+- name: postgres
+  image: postgres:11
+  environment:
+    POSTGRES_DB: dbal_development
+    POSTGRES_PASSWORD: dbal
+    POSTGRES_USER: dbal
+
+volumes:
+- name: deps
+  temp: {}
