@@ -1,5 +1,3 @@
-github.com/c2fo/testify v0.0.0-20150827203832-fba96363964a h1:lXGVReN5qeiyu6AZpIgYJN1PoXSy1koT3nUP3ZRMWm0=
-github.com/c2fo/testify v0.0.0-20150827203832-fba96363964a/go.mod h1:NWprYCk3t+OPBp2UnxQ39EF9vPpUzoMr498TiqMA8jU=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/lib/pq v1.10.0 h1:Zx5DJFEYQXio93kgXnQ09fXNiUKsqv4OUEu2UtGcB1E=

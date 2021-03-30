@@ -3,8 +3,8 @@ package sqltmpl
 import (
 	"testing"
 
-	"github.com/c2fo/testify/require"
 	"github.com/lib/pq"
+	"github.com/stretchr/testify/require"
 )
 
 // QueryParsingTest represents a single t of prsr parsing. Given an [Input]
